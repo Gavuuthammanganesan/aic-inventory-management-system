@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIC Inventory App</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* ============= SIDEBAR ============= */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+            color: #fff;
+            padding: 30px 0;
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(0, 184, 212, 0.5);
+            border-radius: 3px;
+        }
+
+        .sidebar-header {
+            padding: 20px 25px;
+            border-bottom: 2px solid #00b8d4;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .sidebar-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #00b8d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-header i {
+            font-size: 28px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            margin: 8px 0;
+            color: #e0e0e0;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0, 184, 212, 0.2);
+            color: #00b8d4;
+            padding-left: 25px;
+        }
+
+        .nav-item.active {
+            background-color: #00b8d4;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .nav-item.active i {
+            color: #1a1a1a;
+        }
+
+        /* ============= TOP BAR ============= */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            border-bottom: 2px solid #00b8d4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 999;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .toggle-sidebar:hover {
+            color: #00b8d4;
+        }
+
+        .breadcrumb {
+            font-family: 'Roboto', sans-serif;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .breadcrumb strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .topbar-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .topbar-icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .topbar-icon-btn:hover {
+            color: #00b8d4;
+            transform: scale(1.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: #e0e0e0;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b8d4, #0097a7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* ============= MAIN CONTENT AREA ============= */
+        .main-content {
+            margin-left: 280px;
+            margin-top: 70px;
+            width: calc(100% - 280px);
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            padding: 30px;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #00b8d4;
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: #0097a7;
+        }
+
+        /* ============= DROPDOWN MENU ============= */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            z-index: 998;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+            color: #00b8d4;
+            padding-left: 25px;
+        }
+
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+        }
+
+        /* ============= RESPONSIVE DESIGN ============= */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .topbar {
+                left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .topbar-right {
+                gap: 15px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .sidebar-header h1 {
+                font-size: 18px;
+            }
+
+            .nav-item {
+                padding: 12px 15px;
+                gap: 12px;
+            }
+
+            .nav-item i {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .topbar-icons {
+                gap: 10px;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .topbar-icon-btn {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>
+                    <i class="fas fa-boxes"></i>
+                    AIC Inventory App
+                </h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="<?= getScriptUrl() ?>?page=dashboard" class="nav-item" data-page="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=inventory" class="nav-item" data-page="inventory">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=suppliers" class="nav-item" data-page="suppliers">
+                    <i class="fas fa-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=customers" class="nav-item" data-page="customers">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=purchases" class="nav-item" data-page="purchases">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Purchases</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=sales" class="nav-item" data-page="sales">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Sales</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=receipts" class="nav-item" data-page="receipts">
+                    <i class="fas fa-receipt"></i>
+                    <span>Receipts</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=payments" class="nav-item" data-page="payments">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="<?= getScriptUrl() ?>?page=reports" class="nav-item" data-page="reports">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- TOP BAR -->
+        <header class="topbar" id="topbar">
+            <div class="topbar-left">
+                <button class="toggle-sidebar" id="toggleSidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    Welcome, <strong id="pageName">Dashboard</strong>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="topbar-icons">
+                    <button class="topbar-icon-btn" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="topbar-icon-btn" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="topbar-icon-btn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">GA</div>
+                    <div class="user-info">
+                        <div class="user-name">Gavua Thamma</div>
+                        <div class="user-role">Admin</div>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-key"></i>
+                    <span>Change Password</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help & Support</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content" id="mainContent">
+            <?!= include('<?= pageTemplates[contentTemplate] || "index" ?>') ?>
+        </main>
+    </div>
+
+    <script>
+        // ============= PAGE NAVIGATION =============
+        const pageTemplates = {
+            'dashboard': 'index',
+            'inventory': 'inventory',
+            'suppliers': 'suppliers',
+            'customers': 'customers',
+            'purchases': 'purchases',
+            'sales': 'sales',
+            'receipts': 'receipts',
+            'payments': 'payments',
+            'reports': 'reports'
+        };
+
+        // Get current page from URL
+        function getCurrentPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('page') || 'dashboard';
+        }
+
+        // Update active nav item
+        function updateActiveNav() {
+            const currentPage = getCurrentPage();
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === currentPage) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update breadcrumb
+            const pageName = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+            document.getElementById('pageName').textContent = pageName;
+        }
+
+        // ============= SIDEBAR TOGGLE =============
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggleSidebarBtn.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // ============= DROPDOWN MENU =============
+        const userProfile = document.getElementById('userProfile');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        userProfile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userProfile.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
+        // Close dropdown when clicking a menu item
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                dropdownMenu.classList.remove('active');
+            });
+        });
+
+        // ============= NAVIGATION HANDLING =============
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.dataset.page;
+                window.location.href = `<?= getScriptUrl() ?>?page=${page}`;
+            });
+        });
+
+        // Update active nav on page load
+        updateActiveNav();
+
+        // Handle back/forward browser buttons
+        window.addEventListener('popstate', updateActiveNav);
+
+        // ============= RESPONSIVE SIDEBAR HANDLING =============
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // ============= NOTIFICATION BUTTON =============
+        document.querySelectorAll('.topbar-icon-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                icon.style.animation = 'none';
+                setTimeout(() => {
+                    icon.style.animation = 'bounce 0.6s';
+                }, 10);
+            });
+        });
+
+        // Add bounce animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
